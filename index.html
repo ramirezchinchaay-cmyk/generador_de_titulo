@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador Inteligente de Investigación Académica – UNASAM</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- docx & FileSaver para exportación a Word -->
+    <script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        unasamNavy: '#0c2340',
+                        unasamBlue: '#1d4ed8',
+                        unasamLight: '#e0f2fe',
+                        unasamGold: '#d97706',
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        sans: ['Quicksand', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #0c2340 50%, #1e293b 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.37);
+        }
+
+        .btn-action {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29, 78, 216, 0.4);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e3a8a;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 text-slate-100 flex flex-col justify-between">
+
+    <!-- CABECERA INSTITUCIONAL UNASAM -->
+    <header class="max-w-6xl mx-auto w-full text-center my-4">
+        <div class="glass-card rounded-3xl p-6 border-b-4 border-amber-500 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl text-amber-400 font-cinzel pointer-events-none">
+                UNASAM
+            </div>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-2">
+                <div class="w-16 h-16 bg-gradient-to-tr from-amber-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-graduation-cap text-3xl text-white"></i>
+                </div>
+                <div class="text-center md:text-left">
+                    <h1 class="font-cinzel text-2xl md:text-4xl font-bold tracking-wide text-amber-400">
+                        UNIVERSIDAD NACIONAL SANTIAGO ANTÚNEZ DE MAYOLO
+                    </h1>
+                    <p class="text-xs md:text-sm font-semibold tracking-wider text-cyan-300 uppercase">
+                        Escuela Profesional de Administración • Huaraz, Perú
+                    </p>
+                </div>
+            </div>
+            <h2 class="text-lg md:text-xl font-bold text-slate-200 mt-2">
+                Generador Inteligente de Investigación Académica
+            </h2>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto w-full flex flex-col gap-6">
+
+        <!-- SECCIÓN 1: SELECCIÓN DEL AUTOR METODOLÓGICO -->
+        <section class="glass-card rounded-3xl p-5 md:p-6">
+            <h3 class="text-xl font-bold text-amber-400 flex items-center gap-2 mb-4 border-b border-slate-700/60 pb-2">
+                <i class="fa-solid fa-book-bookmark text-blue-400"></i> 1. Marco Metodológico de Referencia
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <label class="cursor-pointer border-2 border-slate-700 rounded-2xl p-4 transition-all hover:border-blue-500 bg-slate-900/60 flex items-start gap-3">
+                    <input type="radio" name="autorSelect" value="sampieri" class="mt-1 accent-blue-500" checked onchange="cambiarAutor()">
+                    <div>
+                        <div class="font-bold text-lg text-white">Roberto Hernández Sampieri (2018)</div>
+                        <div class="text-xs text-slate-400 mt-1">"Metodología de la investigación: Las rutas cuantitativa, cualitativa y mixta"</div>
+                    </div>
+                </label>
+
+                <label class="cursor-pointer border-2 border-slate-700 rounded-2xl p-4 transition-all hover:border-blue-500 bg-slate-900/60 flex items-start gap-3">
+                    <input type="radio" name="autorSelect" value="vara" class="mt-1 accent-blue-500" onchange="cambiarAutor()">
+                    <div>
+                        <div class="font-bold text-lg text-white">Arístides Vara Horna (2012)</div>
+                        <div class="text-xs text-slate-400 mt-1">"Desde la idea inicial hasta la sustentación: 7 pasos para una tesis exitosa"</div>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Caja Informativa del Autor -->
+            <div id="infoAutorBox" class="bg-slate-900/80 border-l-4 border-cyan-400 p-4 rounded-xl text-xs md:text-sm text-slate-300 space-y-1">
+                <!-- Carga vía JS -->
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: BANCO DE 24 EJEMPLOS COMPROBADOS EN ADMINISTRACIÓN -->
+        <section class="glass-card rounded-3xl p-5 md:p-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4 border-b border-slate-700/60 pb-2">
+                <h3 class="text-xl font-bold text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-400"></i> 2. Banco de Ejemplos por Área de Administración (UNASAM)
+                </h3>
+                <button onclick="limpiarCampos()" class="btn-action bg-slate-800 hover:bg-red-600/80 text-white font-bold text-xs py-2 px-4 rounded-xl border border-slate-600 flex items-center gap-2">
+                    <i class="fa-solid fa-broom"></i> Limpiar Campos
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Área Temática:</label>
+                    <select id="areaSelect" onchange="cargarTemasArea()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <!-- JS Dynamic -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Tema de Investigación:</label>
+                    <select id="temaSelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <!-- JS Dynamic -->
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="aplicarEjemplo()" class="w-full btn-action bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-2.5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-sm">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> COMPLETAR TODOS LOS CAMPOS CON ESTE EJEMPLO
+            </button>
+        </section>
+
+        <!-- SECCIÓN 3: OPERACIONALIZACIÓN DE VARIABLES Y DIMENSIONES -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- TARJETA VARIABLE 1 -->
+            <div class="glass-card rounded-3xl p-5 md:p-6 flex flex-col justify-between">
+                <div>
+                    <h4 class="font-bold text-lg text-cyan-300 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-cube"></i> Variable 1 (VI / Relevante)
+                    </h4>
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-slate-400 mb-1">Nombre de la Variable 1:</label>
+                        <input type="text" id="v1Nombre" placeholder="Ej. Gestión del talento humano" oninput="generarInvestigacion()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-blue-500">
+                    </div>
+
+                    <label class="block text-xs font-bold text-slate-400 mb-2">Dimensiones de la Variable 1:</label>
+                    <div id="v1DimensionesContainer" class="space-y-2 mb-3">
+                        <!-- JS Dynamic -->
+                    </div>
+                </div>
+
+                <button onclick="agregarDimension(1)" class="w-full btn-action bg-slate-800 hover:bg-slate-700 border border-cyan-500/30 text-cyan-300 font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Agregar Dimensión a V1
+                </button>
+            </div>
+
+            <!-- TARJETA VARIABLE 2 -->
+            <div class="glass-card rounded-3xl p-5 md:p-6 flex flex-col justify-between">
+                <div>
+                    <h4 class="font-bold text-lg text-pink-400 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-cubes"></i> Variable 2 (VD / Complementaria)
+                    </h4>
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-slate-400 mb-1">Nombre de la Variable 2:</label>
+                        <input type="text" id="v2Nombre" placeholder="Ej. Desempeño laboral" oninput="generarInvestigacion()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-blue-500">
+                    </div>
+
+                    <label class="block text-xs font-bold text-slate-400 mb-2">Dimensiones de la Variable 2:</label>
+                    <div id="v2DimensionesContainer" class="space-y-2 mb-3">
+                        <!-- JS Dynamic -->
+                    </div>
+                </div>
+
+                <button onclick="agregarDimension(2)" class="w-full btn-action bg-slate-800 hover:bg-slate-700 border border-pink-500/30 text-pink-300 font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Agregar Dimensión a V2
+                </button>
+            </div>
+
+        </section>
+
+        <!-- SECCIÓN 4: INFORMACIÓN COMPLEMENTARIA -->
+        <section class="glass-card rounded-3xl p-5 md:p-6">
+            <h3 class="text-xl font-bold text-amber-400 flex items-center gap-2 mb-4 border-b border-slate-700/60 pb-2">
+                <i class="fa-solid fa-compass text-amber-400"></i> 4. Delimitación y Alcance Metodológico
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Población de Estudio:</label>
+                    <input type="text" id="poblacion" placeholder="Ej. los colaboradores" oninput="generarInvestigacion()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Institución / Organización / Empresa:</label>
+                    <input type="text" id="institucion" placeholder="Ej. la Municipalidad Provincial de Huaraz" oninput="generarInvestigacion()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Lugar de Investigación:</label>
+                    <input type="text" id="lugar" placeholder="Ej. Huaraz" oninput="generarInvestigacion()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Año de Investigación:</label>
+                    <input type="text" id="anio" value="2026" oninput="generarInvestigacion()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Alcance de Investigación:</label>
+                    <select id="alcance" onchange="generarInvestigacion()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <option value="correlacional">Correlacional</option>
+                        <option value="explicativo">Explicativo / Causal</option>
+                        <option value="descriptivo">Descriptivo</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Tipo de Relación / Hipótesis:</label>
+                    <select id="direccion" onchange="generarInvestigacion()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <option value="sin_direccion">Sin dirección predeterminada</option>
+                        <option value="positiva">Directa / Positiva</option>
+                        <option value="negativa">Inversa / Negativa</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 5: AUDITORÍA DE COHERENCIA INTELIGENTE -->
+        <section class="glass-card rounded-3xl p-5 md:p-6">
+            <h3 class="text-xl font-bold text-amber-400 flex items-center gap-2 mb-3 border-b border-slate-700/60 pb-2">
+                <i class="fa-solid fa-shield-halved text-emerald-400"></i> 5. Auditoría de Coherencia Metodológica
+            </h3>
+            <div id="auditoriaBox" class="p-4 rounded-2xl text-xs md:text-sm font-semibold transition-all">
+                <!-- JS Dynamic -->
+            </div>
+        </section>
+
+        <!-- SECCIÓN 6: PRESENTACIÓN DE RESULTADOS GENERALES -->
+        <section class="glass-card rounded-3xl p-5 md:p-6">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 border-b border-slate-700/60 pb-3">
+                <h3 class="text-xl font-bold text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-square-poll-vertical text-cyan-400"></i> 6. Elementos Generados de Investigación
+                </h3>
+                <button onclick="copiarTodo()" class="btn-action bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2 px-4 rounded-xl shadow-lg flex items-center gap-2">
+                    <i class="fa-solid fa-copy"></i> COPIAR TODOS LOS RESULTADOS
+                </button>
+            </div>
+
+            <div id="resultadosContainer" class="space-y-4">
+                <!-- JS Dynamic -->
+            </div>
+
+            <!-- BOTÓN DESCARGA WORD -->
+            <div class="mt-8 border-t border-slate-700/60 pt-6">
+                <button onclick="descargarWord()" class="w-full btn-action bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 font-black text-base py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 tracking-wide">
+                    <i class="fa-solid fa-file-word text-2xl"></i> DESCARGAR INVESTIGACIÓN EN WORD (.DOCX)
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="max-w-6xl mx-auto w-full text-center py-6 mt-6 text-xs text-slate-400 font-semibold border-t border-slate-800">
+        <p>UNIVERSIDAD NACIONAL SANTIAGO ANTÚNEZ DE MAYOLO • FACULTAD DE ADMINISTRACIÓN Y TURISMO</p>
+        <p class="text-slate-500 mt-1">Plataforma Formativa Didáctica de Metodología de Tesis • 2026</p>
+    </footer>
+
+    <!-- LOGICA JAVASCRIPT COMPLETA Y AUTÓNOMA -->
+    <script>
+        // BASE DE DATOS DE AUTORES METODOLÓGICOS
+        const AUTORES_DATA = {
+            sampieri: {
+                nombre: "Roberto Hernández Sampieri y Christian P. Mendoza Torres (2018)",
+                cita: "Hernández-Sampieri, R., y Mendoza Torres, C. P. (2018). Metodología de la investigación: Las rutas cuantitativa, cualitativa y mixta. McGraw-Hill Education.",
+                enfoque: "Ruta cuantitativa estructurada. En el alcance descriptivo NO se formulan hipótesis salvo pronósticos específicos. En alcances correlacionales y explicativos se contrasta significancia estadística y direccionalidad de las variables."
+            },
+            vara: {
+                nombre: "Arístides A. Vara Horna (2012)",
+                referencia: "Vara Horna, A. A. (2012). Desde la idea inicial hasta la sustentación: 7 pasos para una tesis exitosa. Un método efectivo para las ciencias empresariales. Universidad de San Martín de Porres.",
+                enfoque: "Método de matriz de consistencia enfocado en Ciencias Empresariales. Enfatiza la delimitiación de variables operacionales y el alineamiento rígido entre título, problema, objetivos e hipótesis de negocio."
+            }
+        };
+
+        // BANCO DE 24 EJEMPLOS COMPROBADOS
+        const BANCO_EJEMPLOS = [
+            // A. MARKETING
+            { area: "Marketing", titulo: "Marketing digital y posicionamiento de marca", v1: "Marketing digital", d1: ["Publicidad en redes sociales", "Marketing de contenidos", "Email marketing"], v2: "Posicionamiento de marca", d2: ["Reconocimiento de marca", "Imagen de marca", "Lealtad del cliente"], poblacion: "los clientes", institucion: "las Mypes comerciales del rubro textil", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+            { area: "Marketing", titulo: "Calidad del servicio y satisfacción del cliente", v1: "Calidad del servicio", d1: ["Fiabilidad", "Capacidad de respuesta", "Empatía"], v2: "Satisfacción del cliente", d2: ["Percepción de valor", "Expectativa del cliente", "Intención de recompra"], poblacion: "los usuarios", institucion: "los restaurantes turísticos", lugar: "Huaraz", anio: "2026", alcance: "explicativo", direccion: "positiva" },
+            { area: "Marketing", titulo: "Estrategias de marketing y fidelización de clientes", v1: "Estrategias de marketing", d1: ["Estrategia de precios", "Promoción de ventas", "Estrategia de distribución"], v2: "Fidelización de clientes", d2: ["Retención de clientes", "Recomendación boca a boca", "Frecuencia de compra"], poblacion: "los clientes habituales", institucion: "las agencias de viajes", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+
+            // B. RECURSOS HUMANOS
+            { area: "Recursos Humanos", titulo: "Gestión del talento humano y desempeño laboral", v1: "Gestión del talento humano", d1: ["Reclutamiento y selección", "Capacitación de personal", "Evaluación del desempeño"], v2: "Desempeño laboral", d2: ["Productividad individual", "Calidad de trabajo", "Cumplimiento de metas"], poblacion: "los colaboradores", institucion: "la Municipalidad Provincial de Huaraz", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+            { area: "Recursos Humanos", titulo: "Clima organizacional y compromiso laboral", v1: "Clima organizacional", d1: ["Comunicación interna", "Reconocimiento y liderazgo", "Condiciones de trabajo"], v2: "Compromiso laboral", d2: ["Identificación con la empresa", "Involucramiento en el trabajo", "Permanencia en la organización"], poblacion: "los trabajadores", institucion: "la Red de Salud Huaylas Sur", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+            { area: "Recursos Humanos", titulo: "Motivación laboral y productividad de los trabajadores", v1: "Motivación laboral", d1: ["Motivación intrínseca", "Motivación extrínseca", "Incentivos remunerativos"], v2: "Productividad laboral", d2: ["Eficiencia de producción", "Rendimiento laboral", "Optimización del tiempo"], poblacion: "los empleados", institucion: "las empresas de transporte interprovincial", lugar: "Huaraz", anio: "2026", alcance: "explicativo", direccion: "positiva" },
+
+            // C. FINANZAS
+            { area: "Finanzas", titulo: "Gestión financiera y rentabilidad empresarial", v1: "Gestión financiera", d1: ["Planificación de inversiones", "Control del capital de trabajo", "Gestión de endeudamiento"], v2: "Rentabilidad empresarial", d2: ["Rentabilidad sobre activos (ROA)", "Rentabilidad sobre patrimonio (ROE)", "Margen neto de utilidad"], poblacion: "los estados financieros", institucion: "las cooperativas de ahorro y crédito", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+            { area: "Finanzas", titulo: "Educación financiera y comportamiento de ahorro", v1: "Educación financiera", d1: ["Conocimiento financiero", "Habilidades presupuestarias", "Nivel de alfabetización digital financiera"], v2: "Comportamiento de ahorro", d2: ["Hábito de ahorro regular", "Fondo de emergencia", "Planificación de jubilación"], poblacion: "los socios activos", institucion: "la Cooperativa Santo Cristo de Bagazán", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+            { area: "Finanzas", titulo: "Gestión de costos y toma de decisiones empresariales", v1: "Gestión de costos", d1: ["Clasificación de costos directos e indirectos", "Control de costos fijos y variables", "Análisis del punto de equilibrio"], v2: "Toma de decisiones empresariales", d2: ["Fijación estratégica de precios", "Optimización de recursos", "Evaluación de rentabilidad por producto"], poblacion: "los gerentes y contadores", institucion: "las microempresas agroindustriales", lugar: "Callejón de Huaylas", anio: "2026", alcance: "explicativo", direccion: "positiva" },
+
+            // D. LOGÍSTICA
+            { area: "Logística", titulo: "Gestión de inventarios y rentabilidad empresarial", v1: "Gestión de inventarios", d1: ["Rotación de inventarios", "Stock de seguridad", "Control de mermas"], v2: "Rentabilidad empresarial", d2: ["Margen bruto de beneficio", "Retorno sobre la inversión", "Reducción de costos operativos"], poblacion: "el personal de logística", institucion: "las empresas distribuidoras de abarrotes", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+            { area: "Logística", titulo: "Gestión de compras y eficiencia operativa", v1: "Gestión de compras", d1: ["Evaluación de proveedores", "Negociación de términos de entrega", "Planificación de requerimientos"], v2: "Eficiencia operativa", d2: ["Cumplimiento de tiempos de entrega", "Reducción de costos de adquisición", "Calidad de insumos"], poblacion: "los analistas logísticos", institucion: "las empresas constructoras", lugar: "Ancash", anio: "2026", alcance: "explicativo", direccion: "positiva" },
+            { area: "Logística", titulo: "Control de almacenes y productividad logística", v1: "Control de almacenes", d1: ["Codificación y ubicación de productos", "Seguridad e higiene en almacén", "Exactitud de inventarios físico-digital"], v2: "Productividad logística", d2: ["Velocidad de despacho", "Optimización de espacios", "Disminución de errores de preparación"], poblacion: "los operadores de almacén", institucion: "los supermercados locales", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+
+            // E. GESTIÓN ESTRATÉGICA
+            { area: "Gestión Estratégica", titulo: "Planeamiento estratégico y competitividad empresarial", v1: "Planeamiento estratégico", d1: ["Análisis del entorno (PESTEL/FODA)", "Formulación de objetivos estratégicos", "Asignación de recursos"], v2: "Competitividad empresarial", d2: ["Cuota de mercado", "Diferenciación de la oferta", "Capacidad de adaptación"], poblacion: "los directivos y ejecutivos", institucion: "las empresas hoteleras de 3 estrellas", lugar: "Huaraz", anio: "2026", alcance: "explicativo", direccion: "positiva" },
+            { area: "Gestión Estratégica", titulo: "Liderazgo gerencial y desempeño organizacional", v1: "Liderazgo gerencial", d1: ["Estilo de comunicación", "Toma de decisiones participativa", "Capacidad de motivación"], v2: "Desempeño organizacional", d2: ["Cumplimiento del plan operativo", "Satisfacción laboral interna", "Adaptación al cambio"], poblacion: "los Jefes de Área", institucion: "la Compañía Minera Antamina (contratistas locales)", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+            { area: "Gestión Estratégica", titulo: "Gestión administrativa y calidad del servicio", v1: "Gestión administrativa", d1: ["Planeación y organización", "Dirección operativa", "Control de procesos internos"], v2: "Calidad del servicio", d2: ["Oportunidad de atención", "Efectividad del trámite", "Satisfacción del usuario"], poblacion: "los usuarios concurrentes", institucion: "el Gobierno Regional de Áncash - Sede Central", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+
+            // F. EMPRENDIMIENTO
+            { area: "Emprendimiento", titulo: "Innovación empresarial y competitividad", v1: "Innovación empresarial", d1: ["Innovación de producto", "Innovación de procesos", "Innovación en modelo de negocio"], v2: "Competitividad", d2: ["Posicionamiento en el mercado", "Eficiencia en costes", "Crecimiento en ventas"], poblacion: "los fundadores y emprendedores", institucion: "las startups agroexportadoras", lugar: "Áncash", anio: "2026", alcance: "explicativo", direccion: "positiva" },
+            { area: "Emprendimiento", titulo: "Cultura emprendedora e intención de emprendimiento", v1: "Cultura emprendedora", d1: ["Educación en emprendimiento", "Tolerancia al riesgo", "Creatividad e iniciativa"], v2: "Intención de emprendimiento", d2: ["Deseabilidad del negocio", "Factibilidad percibida", "Planes de autoempleo"], poblacion: "los estudiantes universitarios de último ciclo", institucion: "la Universidad Nacional Santiago Antúnez de Mayolo", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+            { area: "Emprendimiento", titulo: "Gestión empresarial y sostenibilidad de los emprendimientos", v1: "Gestión empresarial", d1: ["Formalización del negocio", "Gestión comercial", "Control financiero básico"], v2: "Sostenibilidad de los emprendimientos", d2: ["Supervivencia en el mercado", "Viabilidad económica", "Impacto social local"], poblacion: "los microempresarios", institucion: "los emprendimientos del sector gastronómico", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+
+            // G. GESTIÓN PÚBLICA
+            { area: "Gestión Pública", titulo: "Gestión administrativa y satisfacción del ciudadano", v1: "Gestión administrativa", d1: ["Simplificación administrativa", "Transparencia de la información", "Capacitación de los servidores"], v2: "Satisfacción del ciudadano", d2: ["Trato recibido", "Tiempo de espera", "Solución efectiva de reclamos"], poblacion: "los ciudadanos administrados", institucion: "la Municipalidad Distrital de Independencia", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+            { area: "Gestión Pública", titulo: "Gobierno digital y calidad de atención al ciudadano", v1: "Gobierno digital", d1: ["Plataformas de trámite virtual", "Acceso a información pública", "Interoperabilidad de sistemas"], v2: "Calidad de atención al ciudadano", d2: ["Accesibilidad de los servicios", "Rapidez en la atención", "Confiabilidad de las plataformas"], poblacion: "los usuarios de la mesa de partes virtual", institucion: "la Dirección Regional de Educación de Áncash", lugar: "Huaraz", anio: "2026", alcance: "explicativo", direccion: "positiva" },
+            { area: "Gestión Pública", titulo: "Control interno y gestión de los recursos públicos", v1: "Control interno", d1: ["Ambiente de control", "Evaluación de riesgos", "Actividades de supervisión"], v2: "Gestión de recursos públicos", d2: ["Ejecución presupuestal", "Transparencia en contrataciones", "Preservación del patrimonio público"], poblacion: "los funcionarios del área de administración", institucion: "las Unidades de Gestión Educativa Local (UGEL)", lugar: "Zona Sierra de Áncash", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+
+            // H. OPERACIONES Y CALIDAD
+            { area: "Operaciones y Calidad", titulo: "Gestión de procesos y productividad empresarial", v1: "Gestión de procesos", d1: ["Mapeo de procesos", "Estandarización de operaciones", "Reducción de tiempos muertos"], v2: "Productividad empresarial", d2: ["Eficiencia operativa", "Rendimiento por insumo", "Capacidad instalada utilizada"], poblacion: "los jefes de planta y operarios", institucion: "las plantas procesadoras de lácteos", lugar: "Callejón de Huaylas", anio: "2026", alcance: "explicativo", direccion: "positiva" },
+            { area: "Operaciones y Calidad", titulo: "Gestión de calidad y satisfacción del cliente", v1: "Gestión de calidad", d1: ["Control de calidad de insumos", "Aseguramiento de estándares de higiene", "Mejora continua"], v2: "Satisfacción del cliente", d2: ["Percepción de inocuidad", "Conformidad con el producto", "Fidelidad de la clientela"], poblacion: "los clientes finales", institucion: "las empresas panificadoras y de repostería", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" },
+            { area: "Operaciones y Calidad", titulo: "Gestión del tiempo y eficiencia laboral", v1: "Gestión del tiempo", d1: ["Priorización de tareas", "Programación de actividades", "Control de interrupciones"], v2: "Eficiencia laboral", d2: ["Puntualidad en los entregables", "Optimización de jornada laboral", "Reducción de sobretiempo"], poblacion: "los analistas y asistentes", institucion: "las entidades financieras no bancarias", lugar: "Huaraz", anio: "2026", alcance: "correlacional", direccion: "positiva" }
+        ];
+
+        // ESTADO GLOBAL DE DIMENSIONES
+        let dimensionesV1 = [];
+        let dimensionesV2 = [];
+
+        window.onload = function() {
+            cambiarAutor();
+            inicializarEjemplos();
+            dimensionesV1 = ["Reclutamiento y selección", "Capacitación de personal"];
+            dimensionesV2 = ["Productividad individual", "Calidad de trabajo"];
+            renderDimensiones();
+            generarInvestigacion();
+        };
+
+        function cambiarAutor() {
+            const selected = document.querySelector('input[name="autorSelect"]:checked').value;
+            const data = AUTORES_DATA[selected];
+            document.getElementById('infoAutorBox').innerHTML = `
+                <p><strong class="text-amber-400">Autor Seleccionado:</strong> ${data.nombre}</p>
+                <p><strong class="text-cyan-300">Cita APA 7:</strong> <em>${data.cita || data.referencia}</em></p>
+                <p><strong class="text-slate-200">Criterio Doctrinario:</strong> ${data.enfoque}</p>
+            `;
+            generarInvestigacion();
+        }
+
+        function inicializarEjemplos() {
+            const areaSelect = document.getElementById('areaSelect');
+            const areas = [...new Set(BANCO_EJEMPLOS.map(e => e.area))];
+            areaSelect.innerHTML = areas.map(a => `<option value="${a}">${a}</option>`).join('');
+            cargarTemasArea();
+        }
+
+        function cargarTemasArea() {
+            const area = document.getElementById('areaSelect').value;
+            const temaSelect = document.getElementById('temaSelect');
+            const temas = BANCO_EJEMPLOS.filter(e => e.area === area);
+            temaSelect.innerHTML = temas.map(t => `<option value="${t.titulo}">${t.titulo}</option>`).join('');
+        }
+
+        function aplicarEjemplo() {
+            const tituloTema = document.getElementById('temaSelect').value;
+            const ej = BANCO_EJEMPLOS.find(e => e.titulo === tituloTema);
+            if (!ej) return;
+
+            document.getElementById('v1Nombre').value = ej.v1;
+            document.getElementById('v2Nombre').value = ej.v2;
+            dimensionesV1 = [...ej.d1];
+            dimensionesV2 = [...ej.d2];
+            document.getElementById('poblacion').value = ej.poblacion;
+            document.getElementById('institucion').value = ej.institucion;
+            document.getElementById('lugar').value = ej.lugar;
+            document.getElementById('anio').value = ej.anio;
+            document.getElementById('alcance').value = ej.alcance;
+            document.getElementById('direccion').value = ej.direccion;
+
+            renderDimensiones();
+            generarInvestigacion();
+        }
+
+        function limpiarCampos() {
+            document.getElementById('v1Nombre').value = '';
+            document.getElementById('v2Nombre').value = '';
+            dimensionesV1 = [''];
+            dimensionesV2 = [''];
+            document.getElementById('poblacion').value = '';
+            document.getElementById('institucion').value = '';
+            document.getElementById('lugar').value = '';
+            document.getElementById('anio').value = '2026';
+            renderDimensiones();
+            generarInvestigacion();
+        }
+
+        function renderDimensiones() {
+            const div1 = document.getElementById('v1DimensionesContainer');
+            div1.innerHTML = dimensionesV1.map((d, idx) => `
+                <div class="flex gap-2">
+                    <input type="text" value="${d}" placeholder="Dimensión ${idx+1}" oninput="dimensionesV1[${idx}]=this.value; generarInvestigacion();" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+                    <button onclick="eliminarDimension(1, ${idx})" class="bg-red-600/80 hover:bg-red-500 text-white font-bold px-3 py-1 rounded-xl text-xs">X</button>
+                </div>
+            `).join('');
+
+            const div2 = document.getElementById('v2DimensionesContainer');
+            div2.innerHTML = dimensionesV2.map((d, idx) => `
+                <div class="flex gap-2">
+                    <input type="text" value="${d}" placeholder="Dimensión ${idx+1}" oninput="dimensionesV2[${idx}]=this.value; generarInvestigacion();" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-pink-400">
+                    <button onclick="eliminarDimension(2, ${idx})" class="bg-red-600/80 hover:bg-red-500 text-white font-bold px-3 py-1 rounded-xl text-xs">X</button>
+                </div>
+            `).join('');
+        }
+
+        function agregarDimension(variable) {
+            if (variable === 1) dimensionesV1.push('');
+            else dimensionesV2.push('');
+            renderDimensiones();
+            generarInvestigacion();
+        }
+
+        function eliminarDimension(variable, index) {
+            if (variable === 1) {
+                if (dimensionesV1.length > 1) dimensionesV1.splice(index, 1);
+            } else {
+                if (dimensionesV2.length > 1) dimensionesV2.splice(index, 1);
+            }
+            renderDimensiones();
+            generarInvestigacion();
+        }
+
+        function generarInvestigacion() {
+            const v1 = document.getElementById('v1Nombre').value.trim() || '[VARIABLE 1]';
+            const v2 = document.getElementById('v2Nombre').value.trim() || '[VARIABLE 2]';
+            const pob = document.getElementById('poblacion').value.trim() || '[POBLACIÓN]';
+            const inst = document.getElementById('institucion').value.trim() || '[INSTITUCIÓN]';
+            const lug = document.getElementById('lugar').value.trim() || '[LUGAR]';
+            const anio = document.getElementById('anio').value.trim() || '[AÑO]';
+            const alcance = document.getElementById('alcance').value;
+            const direccion = document.getElementById('direccion').value;
+            const autorKey = document.querySelector('input[name="autorSelect"]:checked').value;
+            const autor = AUTORES_DATA[autorKey];
+
+            const dims1 = dimensionesV1.filter(d => d.trim() !== '');
+
+            // Conectores según alcance
+            let conectorTitulo = "Y SU RELACIÓN CON";
+            let verboGeneral = "Determinar la relación entre";
+            let preguntaInicio = "¿Cuál es la relación entre";
+            let nexoHipotesis = "se relaciona significativamente con";
+
+            if (alcance === 'explicativo') {
+                conectorTitulo = "COMO FACTOR DETERMINANTE EN";
+                verboGeneral = "Determinar la influencia de";
+                preguntaInicio = "¿De qué manera influye";
+                nexoHipotesis = "influye significativamente en";
+                if (direccion === 'positiva') nexoHipotesis = "influye de manera directa y significativa en";
+                if (direccion === 'negativa') nexoHipotesis = "influye de manera inversa y significativa en";
+            } else if (alcance === 'correlacional') {
+                conectorTitulo = "Y SU RELACIÓN CON";
+                verboGeneral = "Determinar la relación que existe entre";
+                preguntaInicio = "¿Cuál es la relación que existe entre";
+                nexoHipotesis = "se relaciona significativamente con";
+                if (direccion === 'positiva') nexoHipotesis = "se relaciona de forma directa y significativa con";
+                if (direccion === 'negativa') nexoHipotesis = "se relaciona de forma inversa y significativa con";
+            } else {
+                // Descriptivo
+                conectorTitulo = "Y EL COMPORTAMIENTO DE";
+                verboGeneral = "Describir el nivel de";
+                preguntaInicio = "¿Cuáles son las características de";
+            }
+
+            // Título
+            const tituloGenerado = `${v1} ${conectorTitulo} ${v2} EN ${pob} DE ${inst}, ${lug}, ${anio}`.toUpperCase();
+
+            // Objetivo General
+            let objGeneral = `${verboGeneral} ${v1} y ${v2} en ${pob} de ${inst}, ${lug}, ${anio}.`;
+
+            // Pregunta General
+            let pregGeneral = `${preguntaInicio} ${v1} y ${v2} en ${pob} de ${inst}, ${lug}, ${anio}?`;
+
+            // Hipótesis General (Condicionada)
+            let hipGeneral = "";
+            let tieneHipotesis = true;
+
+            if (alcance === 'descriptivo') {
+                tieneHipotesis = false;
+                hipGeneral = `No corresponde formular hipótesis general. Doctrina: Según ${autor.nombre}, en estudios puramente descriptivos no se establecen hipótesis de contraste a menos que se realice una estimación cuantitativa o pronóstico de una cifra exacta.`;
+            } else {
+                hipGeneral = `Existe evidencia metodológica de que ${v1} ${nexoHipotesis} ${v2} en ${pob} de ${inst}, ${lug}, ${anio}.`;
+            }
+
+            // Derivaciones específicas
+            let objsEspecificos = [];
+            let pregsEspecificas = [];
+            let hipsEspecificas = [];
+
+            const baseDims = dims1.length > 0 ? dims1 : ["[Dimensión]"];
+
+            baseDims.forEach(dim => {
+                if (alcance === 'explicativo') {
+                    objsEspecificos.push(`Determinar la influencia de la dimensión ${dim} de ${v1} en ${v2} en ${pob} de ${inst}, ${lug}, ${anio}.`);
+                    pregsEspecificas.push(`¿De qué manera influye la dimensión ${dim} de ${v1} en ${v2} en ${pob} de ${inst}, ${lug}, ${anio}?`);
+                    if (tieneHipotesis) hipsEspecificas.push(`La dimensión ${dim} de ${v1} ${nexoHipotesis} ${v2} en ${pob} de ${inst}, ${lug}, ${anio}.`);
+                } else if (alcance === 'correlacional') {
+                    objsEspecificos.push(`Determinar la relación entre la dimensión ${dim} de ${v1} y ${v2} en ${pob} de ${inst}, ${lug}, ${anio}.`);
+                    pregsEspecificas.push(`¿Cuál es la relación entre la dimensión ${dim} de ${v1} y ${v2} en ${pob} de ${inst}, ${lug}, ${anio}?`);
+                    if (tieneHipotesis) hipsEspecificas.push(`La dimensión ${dim} de ${v1} ${nexoHipotesis} ${v2} en ${pob} de ${inst}, ${lug}, ${anio}.`);
+                } else {
+                    objsEspecificos.push(`Describir el estado actual de la dimensión ${dim} de la variable ${v1} en ${pob} de ${inst}, ${lug}, ${anio}.`);
+                    pregsEspecificas.push(`¿Cómo se manifiesta la dimensión ${dim} de la variable ${v1} en ${pob} de ${inst}, ${lug}, ${anio}?`);
+                }
+            });
+
+            // RENDER RESULTADOS
+            const container = document.getElementById('resultadosContainer');
+            container.innerHTML = `
+                ${renderItemCard("1. Título de Investigación", `<strong class="text-amber-400 font-bold">${tituloGenerado}</strong>`, tituloGenerado)}
+                ${renderItemCard("2. Objetivo General", objGeneral, objGeneral)}
+                ${renderListCard("3. Objetivos Específicos", objsEspecificos)}
+                ${renderItemCard("4. Pregunta General", pregGeneral, pregGeneral)}
+                ${renderListCard("5. Preguntas Específicas", pregsEspecificas)}
+                ${renderItemCard("6. Hipótesis General", hipGeneral, hipGeneral)}
+                ${tieneHipotesis ? renderListCard("7. Hipótesis Específicas", hipsEspecificas) : renderItemCard("7. Hipótesis Específicas", "<em>No aplica hipótesis para el alcance descriptivo.</em>", "No aplica")}
+                <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-700">
+                    <h4 class="font-bold text-amber-400 text-sm mb-1">8. Sustento Metodológico Formativo</h4>
+                    <p class="text-xs text-slate-300"><strong>Autor seleccionado:</strong> ${autor.nombre}</p>
+                    <p class="text-xs text-slate-300"><strong>Cita APA 7:</strong> <em>${autor.cita || autor.referencia}</em></p>
+                    <p class="text-xs text-slate-400 mt-1">${autor.enfoque}</p>
+                </div>
+            `;
+
+            auditarCoherencia(v1, v2, dims1, pob, inst, lug, anio, alcance);
+        }
+
+        function renderItemCard(title, htmlContent, textToCopy) {
+            return `
+                <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-700/80 relative">
+                    <button onclick="copiarTexto(\`${escapeJs(textToCopy)}\`)" class="absolute top-3 right-3 bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs px-3 py-1 rounded-lg border border-cyan-500/30">
+                        <i class="fa-solid fa-copy"></i> Copiar
+                    </button>
+                    <h4 class="font-bold text-cyan-300 text-xs uppercase mb-2">${title}</h4>
+                    <div class="text-sm text-slate-200 leading-relaxed pr-16">${htmlContent}</div>
+                </div>
+            `;
+        }
+
+        function renderListCard(title, list) {
+            const itemsHtml = list.map(item => `<li class="mb-1">${item}</li>`).join('');
+            const textToCopy = list.join('\n');
+            return `
+                <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-700/80 relative">
+                    <button onclick="copiarTexto(\`${escapeJs(textToCopy)}\`)" class="absolute top-3 right-3 bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs px-3 py-1 rounded-lg border border-cyan-500/30">
+                        <i class="fa-solid fa-copy"></i> Copiar
+                    </button>
+                    <h4 class="font-bold text-cyan-300 text-xs uppercase mb-2">${title}</h4>
+                    <ul class="list-disc list-inside text-sm text-slate-200 leading-relaxed pr-16 space-y-1">${itemsHtml}</ul>
+                </div>
+            `;
+        }
+
+        function escapeJs(str) {
+            return str.replace(/`/g, '\\`').replace(/\$/g, '\\$');
+        }
+
+        function auditarCoherencia(v1, v2, d1, pob, inst, lug, anio, alcance) {
+            const box = document.getElementById('auditoriaBox');
+            let msgs = [];
+
+            if (v1.includes('[') || v1 === '') msgs.push("Ingresa el nombre de la Variable 1.");
+            if (v2.includes('[') || v2 === '') msgs.push("Ingresa el nombre de la Variable 2.");
+            if (d1.length === 0) msgs.push("Agrega al menos una dimensión a la Variable 1.");
+            if (pob.includes('[') || pob === '') msgs.push("Especifica la población de estudio.");
+            if (inst.includes('[') || inst === '') msgs.push("Ingresa la empresa u organización.");
+            if (lug.includes('[') || lug === '') msgs.push("Especifica la delimitación geográfica.");
+
+            if (msgs.length === 0) {
+                box.className = "p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300";
+                box.innerHTML = `
+                    <div class="flex items-center gap-2 font-bold text-base">
+                        <i class="fa-solid fa-circle-check text-emerald-400"></i> COHERENCIA METODOLÓGICA VALIDADA CON ÉXITO
+                    </div>
+                    <p class="text-xs text-emerald-200 mt-1">Existe alineamiento sistemático entre el título, variables, dimensiones, delimitación y formulación de objetivos e hipótesis.</p>
+                `;
+            } else {
+                box.className = "p-4 rounded-2xl bg-amber-950/60 border border-amber-500/40 text-amber-300";
+                box.innerHTML = `
+                    <div class="flex items-center gap-2 font-bold text-base">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> OBSERVACIONES METODOLÓGICAS:
+                    </div>
+                    <ul class="list-disc list-inside text-xs mt-1 space-y-0.5">${msgs.map(m => `<li>${m}</li>`).join('')}</ul>
+                `;
+            }
+        }
+
+        function copiarTexto(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Copiado al portapapeles.");
+            });
+        }
+
+        function copiarTodo() {
+            const container = document.getElementById('resultadosContainer');
+            navigator.clipboard.writeText(container.innerText).then(() => {
+                alert("Todos los resultados copiados al portapapeles.");
+            });
+        }
+
+        // DESCARGA FORMATO DOCX / FALLBACK DOC
+        function descargarWord() {
+            const autorKey = document.querySelector('input[name="autorSelect"]:checked').value;
+            const autor = AUTORES_DATA[autorKey];
+
+            const v1 = document.getElementById('v1Nombre').value || 'V1';
+            const v2 = document.getElementById('v2Nombre').value || 'V2';
+            const pob = document.getElementById('poblacion').value || 'Población';
+            const inst = document.getElementById('institucion').value || 'Institución';
+            const lug = document.getElementById('lugar').value || 'Lugar';
+            const anio = document.getElementById('anio').value || '2026';
+            const alcance = document.getElementById('alcance').value;
+
+            const resDivs = document.querySelectorAll('#resultadosContainer > div');
+            const tituloText = resDivs[0].querySelector('div').innerText;
+            const objGenText = resDivs[1].querySelector('div').innerText;
+            const objsEspText = resDivs[2].querySelector('ul').innerText;
+            const pregGenText = resDivs[3].querySelector('div').innerText;
+            const pregsEspText = resDivs[4].querySelector('ul').innerText;
+            const hipGenText = resDivs[5].querySelector('div').innerText;
+            const hipsEspText = resDivs[6].querySelector('ul') ? resDivs[6].querySelector('ul').innerText : "No aplica por alcance descriptivo.";
+
+            if (typeof docx === 'undefined') {
+                descargarFallbackWord(tituloText, objGenText, objsEspText, pregGenText, pregsEspText, hipGenText, hipsEspText, autor, v1, v2, pob, inst, lug, anio, alcance);
+                return;
+            }
+
+            const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docx;
+
+            const doc = new Document({
+                sections: [{
+                    children: [
+                        new Paragraph({ text: "UNIVERSIDAD NACIONAL SANTIAGO ANTÚNEZ DE MAYOLO", heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER }),
+                        new Paragraph({ text: "FACULTAD DE ADMINISTRACIÓN Y TURISMO", heading: HeadingLevel.HEADING_2, alignment: AlignmentType.CENTER }),
+                        new Paragraph({ text: "ESCUELA PROFESIONAL DE ADMINISTRACIÓN", alignment: AlignmentType.CENTER, spacing: { after: 300 } }),
+                        new Paragraph({ children: [new TextRun({ text: "PROYECTO DE INVESTIGACIÓN CIENTÍFICA", bold: true })], alignment: AlignmentType.CENTER, spacing: { after: 300 } }),
+                        new Paragraph({ children: [new TextRun({ text: tituloText, bold: true, color: "0C2340", size: 24 })], alignment: AlignmentType.CENTER, spacing: { after: 400 } }),
+                        new Paragraph({ text: `Lugar y Año: ${lug}, Perú - ${anio}`, alignment: AlignmentType.RIGHT, spacing: { after: 400 } }),
+                        
+                        new Paragraph({ text: "1. DATOS GENERALES", heading: HeadingLevel.HEADING_2 }),
+                        new Paragraph({ text: `Variable 1: ${v1}` }),
+                        new Paragraph({ text: `Variable 2: ${v2}` }),
+                        new Paragraph({ text: `Población: ${pob}` }),
+                        new Paragraph({ text: `Institución: ${inst}` }),
+                        new Paragraph({ text: `Alcance: ${alcance.toUpperCase()}` }),
+                        new Paragraph({ text: `Autor Metodológico: ${autor.nombre}`, spacing: { after: 200 } }),
+
+                        new Paragraph({ text: "2. ESTRUCTURA METODOLÓGICA DE INVESTIGACIÓN", heading: HeadingLevel.HEADING_2 }),
+                        new Paragraph({ text: "2.1 Objetivo General", bold: true }),
+                        new Paragraph({ text: objGenText, spacing: { after: 150 } }),
+                        new Paragraph({ text: "2.2 Objetivos Específicos", bold: true }),
+                        new Paragraph({ text: objsEspText, spacing: { after: 150 } }),
+                        new Paragraph({ text: "2.3 Pregunta General", bold: true }),
+                        new Paragraph({ text: pregGenText, spacing: { after: 150 } }),
+                        new Paragraph({ text: "2.4 Preguntas Específicas", bold: true }),
+                        new Paragraph({ text: pregsEspText, spacing: { after: 150 } }),
+                        new Paragraph({ text: "2.5 Hipótesis General", bold: true }),
+                        new Paragraph({ text: hipGenText, spacing: { after: 150 } }),
+                        new Paragraph({ text: "2.6 Hipótesis Específicas", bold: true }),
+                        new Paragraph({ text: hipsEspText, spacing: { after: 300 } }),
+
+                        new Paragraph({ text: "3. SUSTENTO METODOLÓGICO Y REFERENCIA APA 7", heading: HeadingLevel.HEADING_2 }),
+                        new Paragraph({ text: autor.cita || autor.referencia, italic: true }),
+                    ]
+                }]
+            });
+
+            Packer.toBlob(doc).then(blob => {
+                saveAs(blob, "Investigacion_UNASAM.docx");
+            });
+        }
+
+        function descargarFallbackWord(tituloText, objGenText, objsEspText, pregGenText, pregsEspText, hipGenText, hipsEspText, autor, v1, v2, pob, inst, lug, anio, alcance) {
+            const html = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head><meta charset='utf-8'></head>
+                <body style="font-family: Arial, sans-serif;">
+                    <h1 style="text-align:center;">UNIVERSIDAD NACIONAL SANTIAGO ANTÚNEZ DE MAYOLO</h1>
+                    <h2 style="text-align:center;">FACULTAD DE ADMINISTRACIÓN Y TURISMO</h2>
+                    <br/>
+                    <h3 style="text-align:center; color:#0c2340;">${tituloText}</h3>
+                    <hr/>
+                    <h3>1. DATOS GENERALES</h3>
+                    <p><b>Variable 1:</b> ${v1}</p>
+                    <p><b>Variable 2:</b> ${v2}</p>
+                    <p><b>Alcance:</b> ${alcance}</p>
+                    <p><b>Autor:</b> ${autor.nombre}</p>
+                    <h3>2. MATRIZ DE INVESTIGACIÓN</h3>
+                    <p><b>Objetivo General:</b> ${objGenText}</p>
+                    <p><b>Objetivos Específicos:</b><br/>${objsEspText.replace(/\n/g, '<br/>')}</p>
+                    <p><b>Pregunta General:</b> ${pregGenText}</p>
+                    <p><b>Preguntas Específicas:</b><br/>${pregsEspText.replace(/\n/g, '<br/>')}</p>
+                    <p><b>Hipótesis General:</b> ${hipGenText}</p>
+                    <p><b>Hipótesis Específicas:</b><br/>${hipsEspText.replace(/\n/g, '<br/>')}</p>
+                    <h3>3. REFERENCIAS</h3>
+                    <p><i>${autor.cita || autor.referencia}</i></p>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Investigacion_UNASAM.doc';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
